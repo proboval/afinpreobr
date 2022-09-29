@@ -14,11 +14,20 @@ class mywindow(QMainWindow):
         self.start_paint = False
         self.paint_pol = True
         self.dek = True
+        self.transfer = False
+        self.scaling = False
+        self.reflection = False
+        self.turn = False
+
         self.arrPol_pi = []
         self.arrPol_dek_x = []
         self.arrPol_dek_y = []
         self.ui.setupUi(self)
         self.ui.pushButton.clicked.connect(lambda: self.buttonClicked())
+        self.ui.pushButton_2.clicked.connect(lambda: self.buttonClicked_2())
+        self.ui.pushButton_3.clicked.connect(lambda: self.buttonClicked_3())
+        self.ui.pushButton_4.clicked.connect(lambda: self.buttonClicked_4())
+        self.ui.pushButton_5.clicked.connect(lambda: self.buttonClicked_5())
         self.initUI()
 
     def initUI(self):
@@ -32,12 +41,41 @@ class mywindow(QMainWindow):
             self.paint_pol = False
             self.dek = False
             self.arrPol_pi.clear()
+            self.ui.tableWidget.clear()
         else:
             self.ui.pushButton.setText("Начать отрисовку Фигуры")
             self.start_paint = False
             self.paint_pol = True
             self.dek = True
             self.update()
+
+    def buttonClicked_2(self):
+        self.transfer = True
+        self.scaling = False
+        self.reflection = False
+        self.turn = False
+        self.update()
+
+    def buttonClicked_3(self):
+        self.transfer = False
+        self.scaling = True
+        self.reflection = False
+        self.turn = False
+        self.update()
+
+    def buttonClicked_4(self):
+        self.transfer = False
+        self.scaling = False
+        self.reflection = True
+        self.turn = False
+        self.update()
+
+    def buttonClicked_5(self):
+        self.transfer = False
+        self.scaling = False
+        self.reflection = False
+        self.turn = True
+        self.update()
 
     def mousePressEvent(self, event):
         if self.start_paint:
@@ -114,12 +152,30 @@ class mywindow(QMainWindow):
                 self.arrPol_dek_x.append((self.arrPol_pi[i].x() - x0_1) / dx)
                 self.arrPol_dek_y.append((y0 - self.arrPol_pi[i].y()) / dx)
 
+            self.ui.tableWidget.setColumnCount(len(self.arrPol_pi))
             for i in range(len(self.arrPol_dek_x)):
-                col_count = self.ui.tableWidget.columnCount()
-                col_count += 1
-                self.ui.tableWidget.setColumnCount(col_count)
                 self.ui.tableWidget.setItem(0, i, QTableWidgetItem(str(self.arrPol_dek_x[i])))
                 self.ui.tableWidget.setItem(1, i, QTableWidgetItem(str(self.arrPol_dek_y[i])))
+
+
+
+        if self.transfer:
+            tr_dek = self.ui.doubleSpinBox.value()
+            arrPol_dek_y_new = []
+            for i in range(len(self.arrPol_dek_y)):
+                arrPol_dek_y_new.append(self.arrPol_dek_y[i] + tr_dek)
+
+            arrPol_pi_new = []
+
+            self.ui.tableWidget_2.setColumnCount(len(self.arrPol_pi))
+            for i in range(len(self.arrPol_dek_x)):
+                self.ui.tableWidget_2.setItem(0, i, QTableWidgetItem(str(self.arrPol_dek_x[i])))
+                self.ui.tableWidget_2.setItem(1, i, QTableWidgetItem(str(arrPol_dek_y_new[i])))
+
+            for i in range(len(self.arrPol_dek_x)):
+                arrPol_pi_new.append(QPoint(int(round((self.arrPol_dek_x[i] * dx + x0_2))), int(round(y0 - arrPol_dek_y_new[i] * dx))))
+
+            qp.drawPolygon(arrPol_pi_new)
 
         qp.end()
 

@@ -50,6 +50,7 @@ class Ui_Form(object):
         self.tableWidget_2.setVerticalHeaderItem(1, item)
         self.doubleSpinBox = QtWidgets.QDoubleSpinBox(Form)
         self.doubleSpinBox.setGeometry(QtCore.QRect(190, 600, 51, 31))
+        self.doubleSpinBox.setMinimum(-10)
         self.doubleSpinBox.setObjectName("doubleSpinBox")
         self.spinBox = QtWidgets.QSpinBox(Form)
         self.spinBox.setGeometry(QtCore.QRect(165, 560, 41, 31))
