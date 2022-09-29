@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPainter, QColor, QPen, QBrush
 from PyQt5.QtCore import Qt, QPoint
 from form import Ui_Form
+import numpy as np
 
 import sys
 
@@ -40,6 +41,10 @@ class mywindow(QMainWindow):
             self.start_paint = True
             self.paint_pol = False
             self.dek = False
+            self.transfer = False
+            self.scaling = False
+            self.reflection = False
+            self.turn = False
             self.arrPol_pi.clear()
             self.arrPol_dek_x.clear()
             self.arrPol_dek_y.clear()
@@ -178,8 +183,42 @@ class mywindow(QMainWindow):
 
             qp.drawPolygon(arrPol_pi_new)
 
-        # if self.turn:
+        if self.reflection:
+            n_top = self.ui.spinBox_2.value()
+            arr1 = []
 
+            for i in range(len(self.arrPol_pi)):
+                arr1.append([self.arrPol_dek_x[i], self.arrPol_dek_y[i], 1])
+
+            mtrx_1 = [[1, 0, 0],
+                      [0, 1, 0],
+                      [(-1) * self.arrPol_dek_x[n_top], (-1) * self.arrPol_dek_y[n_top], 1]]
+
+            mtrx_2 = [[-1, 0, 0],
+                      [0, -1, 0],
+                      [0, 0, 1]]
+
+            mtrx_3 = [[1, 0, 0],
+                      [0, 1, 0],
+                      [self.arrPol_dek_x[n_top], self.arrPol_dek_y[n_top], 1]]
+
+            for i in range(len(self.arrPol_pi)):
+                arr1[i] = np.matmul(arr1[i], mtrx_1)
+                arr1[i] = np.matmul(arr1[i], mtrx_2)
+                arr1[i] = np.matmul(arr1[i], mtrx_3)
+
+            self.ui.tableWidget_2.setColumnCount(len(self.arrPol_pi))
+            for i in range(len(self.arrPol_pi)):
+                self.ui.tableWidget_2.setItem(0, i, QTableWidgetItem(str(arr1[i][0])))
+                self.ui.tableWidget_2.setItem(1, i, QTableWidgetItem(str(arr1[i][1])))
+
+            arrPol_pi_new = []
+
+            for i in range(len(self.arrPol_pi)):
+                arrPol_pi_new.append(QPoint(int(round((arr1[i][0] * dx + x0_2))),
+                                            int(round(y0 - arr1[i][1] * dx))))
+
+            qp.drawPolygon(arrPol_pi_new)
 
         qp.end()
 
