@@ -220,6 +220,33 @@ class mywindow(QMainWindow):
 
             qp.drawPolygon(arrPol_pi_new)
 
+        if self.turn:
+            fi = self.ui.spinBox_3.value()
+            arr1 = []
+
+            for i in range(len(self.arrPol_pi)):
+                arr1.append([self.arrPol_dek_x[i], self.arrPol_dek_y[i], 1])
+
+            mtrx_2 = [[np.cos(fi * np.pi / 180), np.sin(fi * np.pi / 180), 0],
+                      [(-1) * np.sin(fi * np.pi / 180), np.cos(fi * np.pi / 180), 0],
+                      [0, 0, 1]]
+
+            for i in range(len(self.arrPol_pi)):
+                arr1[i] = np.matmul(arr1[i], mtrx_2)
+
+            self.ui.tableWidget_2.setColumnCount(len(self.arrPol_pi))
+            for i in range(len(self.arrPol_pi)):
+                self.ui.tableWidget_2.setItem(0, i, QTableWidgetItem(str(arr1[i][0])))
+                self.ui.tableWidget_2.setItem(1, i, QTableWidgetItem(str(arr1[i][1])))
+
+            arrPol_pi_new = []
+
+            for i in range(len(self.arrPol_pi)):
+                arrPol_pi_new.append(QPoint(int(round((arr1[i][0] * dx + x0_2))),
+                                            int(round(y0 - arr1[i][1] * dx))))
+
+            qp.drawPolygon(arrPol_pi_new)
+
         qp.end()
 
 

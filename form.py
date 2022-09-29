@@ -62,6 +62,8 @@ class Ui_Form(object):
         self.spinBox_2.setGeometry(QtCore.QRect(425, 560, 41, 31))
         self.spinBox_2.setObjectName("spinBox_2")
         self.spinBox_3 = QtWidgets.QSpinBox(Form)
+        self.spinBox_3.setMaximum(360)
+        self.spinBox_3.setMinimum(-360)
         self.spinBox_3.setGeometry(QtCore.QRect(425, 600, 41, 31))
         self.spinBox_3.setObjectName("spinBox_3")
 
