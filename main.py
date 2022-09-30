@@ -3,7 +3,6 @@ from PyQt5.QtGui import QPainter, QColor, QPen, QBrush
 from PyQt5.QtCore import Qt, QPoint
 from form import Ui_Form
 import numpy as np
-
 import sys
 
 
@@ -146,11 +145,15 @@ class mywindow(QMainWindow):
                 qp.drawLine(mid, y0 - dx * i, size.width() - 5, y0 - dx * i)
 
         pen = QPen(QPen(Qt.darkBlue, 2))
+        pen_1 = QPen(Qt.black, 1)
+
+        for i in range(len(self.arrPol_pi)):
+            qp.setPen(pen)
+            qp.drawPoint(self.arrPol_pi[i])
+            qp.setPen(pen_1)
+            qp.drawText(self.arrPol_pi[i].x(), self.arrPol_pi[i].y(), str(i))
 
         qp.setPen(pen)
-        for i in range(len(self.arrPol_pi)):
-            qp.drawPoint(self.arrPol_pi[i])
-
         if len(self.arrPol_pi) != 0 and self.paint_pol:
             qp.drawPolygon(self.arrPol_pi)
 
@@ -167,6 +170,7 @@ class mywindow(QMainWindow):
         if self.transfer:
             tr_dek = self.ui.doubleSpinBox.value()
             arrPol_dek_y_new = []
+
             for i in range(len(self.arrPol_dek_y)):
                 arrPol_dek_y_new.append(self.arrPol_dek_y[i] + tr_dek)
 
@@ -246,6 +250,70 @@ class mywindow(QMainWindow):
                                             int(round(y0 - arr1[i][1] * dx))))
 
             qp.drawPolygon(arrPol_pi_new)
+
+        if self.scaling:
+            scale = self.ui.doubleSpinBox_2.value()
+            n_top = self.ui.spinBox.value()
+
+            x1 = self.arrPol_dek_x[n_top]
+            y1 = self.arrPol_dek_y[n_top]
+            x2 = self.arrPol_dek_x[n_top - 1]
+            y2 = self.arrPol_dek_y[n_top - 1]
+
+            l1 = np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+            l2 = np.sqrt((y1 - y2) ** 2)
+            l3 = np.sqrt((x1 - x2) ** 2)
+
+            sin_ = l2 / l1
+            cos_ = l3 / l1
+
+            arr1 = []
+
+            for i in range(len(self.arrPol_pi)):
+                arr1.append([self.arrPol_dek_x[i], self.arrPol_dek_y[i], 1])
+
+            mtrx_1 = [[1, 0, 0],
+                      [0, 1, 0],
+                      [(-1) * x2, (-1) * y2, 1]]
+
+            mtrx_2 = [[cos_, (-1) * sin_, 0],
+                      [sin_, cos_, 0],
+                      [0, 0, 1]]
+
+            mtrx_3 = [[scale, 0, 0],
+                      [0, scale, 0],
+                      [0, 0, 1]]
+
+            mtrx_4 = [[(-1) * cos_, sin_, 0],
+                      [(-1) * sin_, (-1) * cos_, 0],
+                      [0, 0, 1]]
+
+            mtrx_5 = [[1, 0, 0],
+                      [0, 1, 0],
+                      [x2, y2, 1]]
+
+            for i in range(len(self.arrPol_pi)):
+                arr1[i] = np.matmul(arr1[i], mtrx_1)
+                arr1[i] = np.matmul(arr1[i], mtrx_2)
+                arr1[i] = np.matmul(arr1[i], mtrx_3)
+                arr1[i] = np.matmul(arr1[i], mtrx_4)
+                arr1[i] = np.matmul(arr1[i], mtrx_5)
+
+            self.ui.tableWidget_2.setColumnCount(len(self.arrPol_pi))
+            for i in range(len(self.arrPol_pi)):
+                self.ui.tableWidget_2.setItem(0, i, QTableWidgetItem(str(arr1[i][0])))
+                self.ui.tableWidget_2.setItem(1, i, QTableWidgetItem(str(arr1[i][1])))
+
+            arrPol_pi_new = []
+
+            for i in range(len(self.arrPol_pi)):
+                arrPol_pi_new.append(QPoint(int(round((arr1[i][0] * dx + x0_2))),
+                                            int(round(y0 - arr1[i][1] * dx))))
+
+            qp.drawPolygon(arrPol_pi_new)
+
+
+
 
         qp.end()
 
